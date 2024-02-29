@@ -35,6 +35,10 @@ if args.MODE:
     DYNAMIC_MODE = int(args.MODE)
 
 def alpha_function(x, alpha, is_using):
+    '''
+      This function have different functions for AI. 
+      Uncomment to select function
+    '''
     ## increasing function with faster rate
     # return alpha * np.power(x + 1, 2)
     # return alpha * np.power(x + 1,1.01)
@@ -53,6 +57,10 @@ def alpha_function(x, alpha, is_using):
     return alpha * np.reciprocal(x + 1)
 
 def beta_function(w, beta, is_using):
+    '''
+      This function have different functions for MD. 
+      Uncomment to select function
+    '''
     ## Constant 
     # return beta
 
@@ -119,7 +127,6 @@ def perron_frobenius(alphas, betas):
     if alphas.shape != betas.shape:
         raise ValueError("Alphas and Betas should have the same size")
     ev = np.divide(alphas, 1 - betas)
-    # normalized = ev / np.linalg.norm(ev)
     return ev
 
 def calculate_closestness(theoritical, experimental):
@@ -136,13 +143,14 @@ def calculate_throughtput(history, is_md):
         if allocation.sum() <= CAPACITY:
             throughput += allocation.sum()
 
-    print("Throughput : ", throughput)
-    print("Maximium Throughput : ", (MAXITERATION - 1) * CAPACITY)
-    print("# of AI:", MAXITERATION - is_md.sum(), ", # of MD:", is_md.sum())
-    print("Percentage of Time Experiences MD:", is_md.sum() * 100 / MAXITERATION, "%")
+    print("Throughput :", throughput)
+    print("Maximium Throughput :", (MAXITERATION - 1) * CAPACITY)
+    print("Number of Iteration where AI occurs :", MAXITERATION - is_md.sum())
+    print("Number of Iteration where MD occurs :", is_md.sum())
+    print("Percentage of Time Experiences MD :", is_md.sum() * 100 / MAXITERATION, "%")
 
 # Graph Plotting
-def plot_2_user_graph(data, fairness, is_multiplicative, title = None):
+def plot_2_user_graph(data, fairness, title = None):
     fairness = fairness * CAPACITY / np.sqrt(np.sum(np.square(fairness)))
     plt.clf()
     plt.title(title)
@@ -153,9 +161,7 @@ def plot_2_user_graph(data, fairness, is_multiplicative, title = None):
     plt.plot([0,fairness[0]],[0,fairness[1]], label = "Theorectical Convergence")
     plt.xlabel("Allocation of User 1")
     plt.ylabel("Allocation of User 2")
-    # idx = np.where(is_multiplicative == 1)[0][0] - 1
     plt.legend()
-    # plt.xlim(0,CAPACITY)
     plt.savefig("diagram/" + OUTPUT + "_allocation_graph.png")
     
 def plot_individual_graph(data, id):
@@ -183,9 +189,7 @@ def main():
     if FAIR != 0:    
         betas = np.random.rand( USER) 
         alphas = np.random.rand( USER) * FAIR
-    
-    betas = np.array([0.3,0.5])
-    alphas = np.array([2, 1])
+
     history, is_md = run_experiment(alphas, betas)
     fairness = perron_frobenius(alphas, betas)
 
@@ -196,7 +200,6 @@ def main():
         print("Plotting Allocation Graph")
         plot_2_user_graph(history,
                     fairness,
-                    is_md,
                     "Parameter a1 = " +
                         str(round(alphas[0],2)) +
                         " , a2 = " +
@@ -208,9 +211,6 @@ def main():
                     )
         plot_individual_graph(history, 0)
         plot_individual_graph(history, 1)
-    # else:
-        # for i in range(USER):
-        #     plot_individual_graph(history, i)
 
 if __name__ == "__main__":
     main()
